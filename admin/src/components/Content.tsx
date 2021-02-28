@@ -6,7 +6,8 @@ export const Content = ({
     centerHoriz,
     fullHeight,
     primary,
-    bgStyle
+    bgStyle,
+    visible
   }: {
     children: any
     center?: boolean
@@ -14,9 +15,10 @@ export const Content = ({
     fullHeight?: boolean
     primary?: boolean
     bgStyle?: 'dot' | 'colour'
+    visible?: boolean
 }) => {
     return (
-        <div className={`hero-container ${fullHeight ? `hero-vh` : ``} ${primary ? `hero-primary` : ``} ${bgStyle ? `hero-bg-${bgStyle}` : ``}`}>
+        <div className={`hero-container ${fullHeight ? `hero-vh` : ``} ${primary ? `hero-primary` : ``} ${bgStyle ? `hero-bg-${bgStyle}` : ``}`} style={{ display: visible ? 'none' : 'inherit' }}>
             <div
                 className={`hero-content ${
                     centerHoriz ? `hero-center-horiz` : center ? `hero-center` : ``

@@ -13,6 +13,9 @@ export const Header = () => {
               <ul className={'nav-items'}>
                 <a href={'/updates'}>Updates</a>
                 <a href={'/updates/add'}>Add an Update</a>
+                <span />
+                <a href={'/targets'}>Targets</a>
+                <a href={'/locales'}>Locales</a>
               </ul>
             </div>
   

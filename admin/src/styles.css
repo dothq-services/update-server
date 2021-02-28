@@ -126,6 +126,16 @@ nav {
   justify-content: center;
 }
 
+label.btn {
+  text-decoration: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: var(--padding, 10px 20px);
+  width: inherit;
+  justify-content: center;
+}
+
 .btn-primary {
   background-color: var(--btn-primary);
   color: var(--btn-primary-color);
@@ -272,32 +282,26 @@ p {
   margin-left: 1rem;
 }
 
-/* Input elements */
-input[type='name'],
-input[type='text'],
-input[type='password'],
-input[type='email'] {
-  background-color: var(--btn-secondary);
-  color: var(--btn-secondary-color);
-  padding: var(--padding, 10px 20px);
-  border-radius: 8px;
-  border: var(--border) 2px solid;
-}
-
-input[type='name']:focus,
-input[type='text']:focus,
-input[type='password']:focus,
-input[type='email']:focus {
-  border-radius: 8px;
-  border: var(--color) 2px solid;
-  outline: none;
-}
-
-
 .hero-bg-dot {
   background-image: radial-gradient(var(--background-dots) 1px,transparent 0),radial-gradient(var(--background-dots) 1px,transparent 0);
   background-repeat: repeat;
   background-size: cover;
   background-size: 40px 40px, 40px 40px;
   background-position: 0 0, 20px 20px;
+}
+
+.flex-grid {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.form-control {
+  padding-left: 10px;
+  padding-right: 10px;
+  min-width: 50%;
+}
+
+input[type=file] {
+  display: none;
 }
