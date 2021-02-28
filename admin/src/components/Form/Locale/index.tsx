@@ -1,8 +1,14 @@
 import React from 'react'
 import { FormControl, InputLabel, Select, MenuItem, FormHelperText } from '@material-ui/core'
 
-export const FormLocaleSelector = () => {
+export const FormLocaleSelector = ({ locales }: { locales: string[] }) => {
     const [locale, setLocale] = React.useState('');
+
+    React.useEffect(() => {
+        if(typeof(locales) == "undefined") return;
+
+        setLocale(locales[0])
+    })
 
     const handleLocaleChange = (event) => {
         setLocale(event.target.value);
@@ -18,10 +24,11 @@ export const FormLocaleSelector = () => {
                 id="rLocale"
                 value={locale}
                 onChange={handleLocaleChange}
-                label="Locale">
-                <MenuItem value={'en-US'}>en-US</MenuItem>
-                <MenuItem value={'en-GB'}>en-GB</MenuItem>
-                <MenuItem value={'en-AU'}>en-AU</MenuItem>
+                label="Locale"
+            >
+                {locales && locales.map((l, key) => (
+                    <MenuItem key={l} value={l}>{l}</MenuItem>
+                ))}  
             </Select>
             <FormHelperText>Locale for a release</FormHelperText>
         </FormControl>

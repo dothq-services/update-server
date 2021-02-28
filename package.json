@@ -1,0 +1,17 @@
+{
+  "name": "update-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "Reimplementation of Mozilla's Balrog in Typescript and Next.js",
+  "repository": "https://github.com/dothq-services/update-service",
+  "author": "Dot HQ <contact@dothq.co>",
+  "license": "MPL-2.0",
+  "scripts": {
+    "start": "concurrently \"yarn run start:admin\" \"echo test\"",
+    "start:admin": "yarn --cwd admin run dev"
+  },
+  "private": true,
+  "devDependencies": {
+    "concurrently": "^6.0.0"
+  }
+}

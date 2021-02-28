@@ -1,0 +1,36 @@
+{
+    "products": [
+        {
+            "id": "browser",
+            "name": "Dot Browser",
+            "availableLocales": [
+                "en-GB",
+                "en-US",
+                "en-AU"
+            ]
+        },
+        {
+            "id": "browser-adblocker",
+            "name": "Dot Browser Adblocker",
+            "availableLocales": [
+                "en-GB",
+                "en-US",
+                "en-AU"
+            ]
+        },
+        {
+            "id": "ntp-extension",
+            "name": "Compass NTP Extension",
+            "availableLocales": [
+                "en-US"
+            ]
+        },
+        {
+            "id": "unknown",
+            "name": "Other",
+            "availableLocales": [
+                "en-US"
+            ]
+        }
+    ]
+}

@@ -1,25 +1,33 @@
 import React from 'react'
 import { Layout } from '../../components/Layout'
 import { Content } from '../../components/Content'
-import { Button } from '../../components/Button'
-import { TextField, Checkbox, InputLabel, MenuItem, FormHelperText, FormControl, FormControlLabel, Select } from '@material-ui/core'
+import { TextField, Checkbox, InputLabel, MenuItem, FormHelperText, FormControl, FormControlLabel, Select, Button } from '@material-ui/core'
 import { FormLocaleSelector } from '../../components/Form/Locale'
 import { FormTargetSelector } from '../../components/Form/Target'
+import axios from 'axios'
+import { Console } from 'console'
 
 const AddUpdate = () => {
+    const [availableProducts, setAProducts] = React.useState([]);
     const [currentUploadedFile, setCurrentUploadedFile] = React.useState('')
     const [advancedMode, setAdvancedMode] = React.useState(false);
-    const [product, setProduct] = React.useState('');
+    const [productKey, setProductKey] = React.useState('');
+    const [product, setProduct] = React.useState(({} as any));
     const [locale, setLocale] = React.useState('');
     const [releaseFileCheckbox, setReleaseFileCheckbox] = React.useState(true)
     const [releaseTypeCheckbox, setReleaseTypeCheckbox] = React.useState(true)
 
     const handleProductChange = (event) => {
-        setProduct(event.target.value);
-    };
+        if(availableProducts.find(i => i.id == event.target.value)) {
+            const product = availableProducts.find(i => i.id == event.target.value);
 
-    const handleLocaleChange = (event) => {
-        setLocale(event.target.value);
+            console.log(product);
+
+            setProductKey(event.target.value);
+            setProduct(product);
+
+            if(product.availableLocales) setLocale(product.availableLocales[0])
+        }
     };
 
     const handleReleaseFileCheckboxChange = (event) => {
@@ -34,12 +42,21 @@ const AddUpdate = () => {
         return path.substr(12);
     }
 
+    React.useEffect(() => {
+        if(availableProducts.length !== 0) return;
+
+        axios.get("/api/get/products") 
+            .then(({ data }) => {
+                setAProducts(data.products);
+            })
+    }, [availableProducts])
+
     return (
         <Layout>
             <Content primary>
                 <div className={'grid'}>
                     <div className={'flex-grid'}>
-                        <h1>Add an Update</h1>
+                        <h1>Create new release</h1>
                     </div>
                 </div>
             </Content>
@@ -53,7 +70,7 @@ const AddUpdate = () => {
                                 id="rName"
                                 name="rName"
                                 label="Release name (Ex. Dot-1.0-build1)"
-                                value={null}
+                                value={""}
                                 onChange={null}
                                 error={null}
                                 helperText={'Release name for use within Admin UI.'}
@@ -67,12 +84,13 @@ const AddUpdate = () => {
                                 <Select
                                     labelId="rProduct-label"
                                     id="rProduct"
-                                    value={product}
+                                    value={productKey}
                                     onChange={handleProductChange}
-                                    label="Product">
-                                    <MenuItem value={'Dot'}>Dot Browser</MenuItem>
-                                    <MenuItem value={'SystemAddons'}>System Addons</MenuItem>
-                                    <MenuItem value={'Other'}>Other</MenuItem>
+                                    label="Product"
+                                >
+                                    {availableProducts && availableProducts.map(product => (
+                                        <MenuItem key={product.id} value={product.id}>{product.name}</MenuItem>
+                                    ))}
                                 </Select>
                                 <FormHelperText>Product to tag release under</FormHelperText>
                             </FormControl>
@@ -87,7 +105,7 @@ const AddUpdate = () => {
             <Content primary visible={advancedMode}>
                 <div className={'flex-grid'}>
                     <div className={'form-control'}>
-                        <FormLocaleSelector />
+                        <FormLocaleSelector selectedLocale={locale} locales={!!product ? product.availableLocales : []} />
                     </div>
                     <div className={'form-control'}>
                         <FormTargetSelector />
@@ -102,7 +120,7 @@ const AddUpdate = () => {
                             id="rVersion"
                             name="rVersion"
                             label="Version Number (Ex. 1.0)"
-                            value={null}
+                            value={""}
                             onChange={null}
                             error={null}
                             helperText={'Update Version'}
@@ -115,7 +133,7 @@ const AddUpdate = () => {
                             id="rVersionPretty"
                             name="rVersionPretty"
                             label="Display Version Number (Ex. 1.0 Beta 1)"
-                            value={null}
+                            value={""}
                             onChange={null}
                             error={null}
                             helperText={'Displayed version number'}
@@ -131,7 +149,7 @@ const AddUpdate = () => {
                             id="rBuildID"
                             name="rBuildID"
                             label="Build ID (Ex. 20210225185804)"
-                            value={null}
+                            value={""}
                             onChange={null}
                             error={null}
                             helperText={'Version Build ID'}
@@ -144,7 +162,7 @@ const AddUpdate = () => {
                             id="rWhatsnew"
                             name="rWhatsnew"
                             label="What's New URL (Ex. https://whatsnew.dothq.co/1.0)"
-                            value={null}
+                            value={""}
                             onChange={null}
                             error={null}
                             helperText={'URL that opens on start (can feature %OLD_VERSION% parameter)'}
@@ -160,7 +178,7 @@ const AddUpdate = () => {
                             id="rReleasenotes"
                             name="rReleasenotes"
                             label="Release Notes URL (Ex. https://releasenotes.dothq.co/1.0)"
-                            value={null}
+                            value={""}
                             onChange={null}
                             error={null}
                             helperText={'Release Notes URL'}
@@ -174,7 +192,7 @@ const AddUpdate = () => {
                                         checked={releaseFileCheckbox}
                                         onChange={handleReleaseFileCheckboxChange}
                                         name="rUploadFile"
-                                        color="default"
+                                        color="primary"
                                     />
                                 }
                                 label="Upload Release Files"
@@ -203,7 +221,7 @@ const AddUpdate = () => {
                                         checked={releaseTypeCheckbox}
                                         onChange={handleReleaseTypeCheckboxChange}
                                         name="rReleaseType"
-                                        color="default"
+                                        color="primary"
                                     />
                                 }
                                 label="Major Release"
@@ -220,7 +238,7 @@ const AddUpdate = () => {
                             id="rReleaseFileURL"
                             name="rReleaseFileURL"
                             label="Release File URL (Ex. https://cdn.dothq.co/%OS%/%LANG%/dot_1.0.mar)"
-                            value={null}
+                            value={""}
                             onChange={null}
                             error={null}
                             helperText={'URL to Release File'}
@@ -233,7 +251,7 @@ const AddUpdate = () => {
                             id="rReleaseFileURLSize"
                             name="rReleaseFileURLSize"
                             label="Release File URL Size (Ex. 80088440)"
-                            value={null}
+                            value={""}
                             onChange={null}
                             error={null}
                             helperText={'Size of Release File in Bytes'}
@@ -249,7 +267,7 @@ const AddUpdate = () => {
                             id="rReleaseFileURLSha"
                             name="rReleaseFileURLSha"
                             label="Release File SHA512 Checksum"
-                            value={null}
+                            value={""}
                             onChange={null}
                             error={null}
                             helperText={'The SHA512 Checksum for the Release File'}
@@ -263,7 +281,7 @@ const AddUpdate = () => {
                                         checked={releaseTypeCheckbox}
                                         onChange={handleReleaseTypeCheckboxChange}
                                         name="rReleaseType"
-                                        color="default"
+                                        color="primary"
                                     />
                                 }
                                 label="Major Release"
@@ -284,10 +302,15 @@ const AddUpdate = () => {
                 <div className={'grid'}>
                     <div className={'flex-grid'}>
                         <Button
-                            onClick={() => {setAdvancedMode(!advancedMode)}}>{advancedMode === true ? 'Simple' : 'Advanced'} Mode
+                            onClick={() => {setAdvancedMode(!advancedMode)}}
+                            color="secondary" 
+                            variant="contained" 
+                            disableElevation
+                        >
+                            {advancedMode === true ? 'Simple' : 'Advanced'} Mode
                         </Button>
                         <div>
-                            <Button type={'primary'}>
+                            <Button variant="contained" color="primary" disableElevation>
                                 Add Release
                             </Button>
                         </div>

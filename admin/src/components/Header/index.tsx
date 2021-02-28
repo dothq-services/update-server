@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../Button'
+import { Button } from '@material-ui/core'
 
 export const Header = () => {
   return (
@@ -19,7 +19,7 @@ export const Header = () => {
             </div>
   
             <div className={'nav-right'}>
-              <Button type={'primary'} href={'/id/login'}>
+              <Button color="primary" variant="contained" disableElevation href={'/id/login'}>
                 Sign in
               </Button>
             </div>
