@@ -1,8 +1,7 @@
 import React from 'react'
 import { Layout } from '../../components/Layout'
 import { Content } from '../../components/Content'
-import { Button } from '../../components/Button'
-import { TextField, Checkbox, InputLabel, MenuItem, FormHelperText, FormControl, FormControlLabel, Select } from '@material-ui/core'
+import { TextField, Checkbox, InputLabel, MenuItem, FormHelperText, FormControl, FormControlLabel, Select, Button } from '@material-ui/core'
 import { FormLocaleSelector } from '../../components/Form/Locale'
 import { FormTargetSelector } from '../../components/Form/Target'
 
@@ -174,7 +173,7 @@ const AddUpdate = () => {
                                         checked={releaseFileCheckbox}
                                         onChange={handleReleaseFileCheckboxChange}
                                         name="rUploadFile"
-                                        color="default"
+                                        color="primary"
                                     />
                                 }
                                 label="Upload Release Files"
@@ -203,7 +202,7 @@ const AddUpdate = () => {
                                         checked={releaseTypeCheckbox}
                                         onChange={handleReleaseTypeCheckboxChange}
                                         name="rReleaseType"
-                                        color="default"
+                                        color="primary"
                                     />
                                 }
                                 label="Major Release"
@@ -263,7 +262,7 @@ const AddUpdate = () => {
                                         checked={releaseTypeCheckbox}
                                         onChange={handleReleaseTypeCheckboxChange}
                                         name="rReleaseType"
-                                        color="default"
+                                        color="primary"
                                     />
                                 }
                                 label="Major Release"
@@ -284,10 +283,15 @@ const AddUpdate = () => {
                 <div className={'grid'}>
                     <div className={'flex-grid'}>
                         <Button
-                            onClick={() => {setAdvancedMode(!advancedMode)}}>{advancedMode === true ? 'Simple' : 'Advanced'} Mode
+                            onClick={() => {setAdvancedMode(!advancedMode)}}
+                            color="secondary" 
+                            variant="contained" 
+                            disableElevation
+                        >
+                            {advancedMode === true ? 'Simple' : 'Advanced'} Mode
                         </Button>
                         <div>
-                            <Button type={'primary'}>
+                            <Button variant="contained" color="primary" disableElevation>
                                 Add Release
                             </Button>
                         </div>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Layout } from '../../components/Layout'
 import { Content } from '../../components/Content'
-import { Button } from '../../components/Button'
+import { Button } from '@material-ui/core'
 import axios from 'axios'
 
 const Targets = () => {
@@ -16,7 +16,7 @@ const Targets = () => {
                 <div className={'grid'}>
                     <div className={'flex-grid'}>
                         <h1>Currently Available Targets</h1>
-                        <Button type={'primary'} href={'/targets/add'}>
+                        <Button color="primary" variant="contained" disableElevation href={'/targets/add'}>
                             Add Target
                         </Button>
                     </div>

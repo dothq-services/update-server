@@ -1,8 +1,7 @@
 import React from 'react'
 import { Layout } from '../../components/Layout'
 import { Content } from '../../components/Content'
-import { Button } from '../../components/Button'
-import { TextField } from '@material-ui/core'
+import { TextField, Button } from '@material-ui/core'
 import axios from 'axios'
 
 const AddTarget = () => {
@@ -92,7 +91,7 @@ const AddTarget = () => {
                 <div className={'grid'}>
                     <div className={'flex-grid'}>
                         <span />
-                        <Button type={'primary'} onClick={submitNewTarget}>
+                        <Button color="primary" variant="contained" disableElevation onClick={submitNewTarget}>
                             Add Target
                         </Button>
                     </div>
