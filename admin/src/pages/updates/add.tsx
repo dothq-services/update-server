@@ -105,7 +105,7 @@ const AddUpdate = () => {
             <Content primary visible={advancedMode}>
                 <div className={'flex-grid'}>
                     <div className={'form-control'}>
-                        <FormLocaleSelector selectedLocale={locale} locales={!!product ? product.availableLocales : []} />
+                        <FormLocaleSelector locales={!!product ? product.availableLocales : []} />
                     </div>
                     <div className={'form-control'}>
                         <FormTargetSelector />

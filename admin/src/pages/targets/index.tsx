@@ -6,8 +6,10 @@ import axios from 'axios'
 
 const Targets = () => {
     const [targets, setTargets] = React.useState({})
-    React.useState(() => {
-        axios.post('/api/get/target').then(res => setTargets(res.data))
+    React.useEffect(() => {
+        axios.post("/api/get/target").then(res => setTargets(res.data)).catch(e => {
+            console.error(e)
+        })
     })
 
     return (
