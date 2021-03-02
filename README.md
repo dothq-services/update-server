@@ -28,6 +28,11 @@ yarn
 ./start.sh
 ```
 
+## Services
+
+* **Admin panel** - http://localhost:9000
+* **Public API** - http://localhost:9010
+
 ## Author
 
 👤 **Dot HQ <contact@dothq.co>**
