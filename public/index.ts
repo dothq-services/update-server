@@ -50,5 +50,5 @@ app.get('/update/1/:product/:version/:buildID/:buildTarget/:locale/:channel/upda
 })
 
 app.listen(port, () => {
-    console.log(`DotUpdate Server Started at http://localhost:${port}`)
+    console.log(`🆙  Dot Update Server started at http://localhost:${port}`)
 });

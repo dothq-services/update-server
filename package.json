@@ -7,8 +7,10 @@
   "author": "Dot HQ <contact@dothq.co>",
   "license": "MPL-2.0",
   "scripts": {
-    "start": "concurrently \"yarn run start:admin\" \"echo test\"",
-    "start:admin": "yarn --cwd admin run dev"
+    "start": "concurrently \"yarn run start:admin\" \"yarn run start:api\"",
+    "start:admin": "yarn --cwd admin run dev",
+    "start:api": "yarn --cwd public start",
+    "install-deps": "yarn && yarn --cwd admin && yarn --cwd public"
   },
   "private": true,
   "devDependencies": {
