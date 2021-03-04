@@ -33,7 +33,7 @@ export const Header = ({
                 <>
                   <img src={uData.avatar_url} style={{ borderRadius: 25, width: 40, height: 40 }} />
                   <p>{uData.name}</p>
-                  <Button color="primary" variant="contained" disableElevation href={'/id/login'}>
+                  <Button color="primary" variant="contained" disableElevation href={'/id/logout'}>
                     Sign Out
                   </Button>
                 </>

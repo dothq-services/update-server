@@ -2,10 +2,31 @@ import React from 'react'
 import { Layout } from '../../components/Layout'
 import { Content } from '../../components/Content'
 import { Button } from '../../components/Button'
+import axios from 'axios'
+import { useCookies } from 'react-cookie'
 
 const Updates = () => {
+    // Is user signed in?
+    const [cookie, setCookie] = useCookies(["token"])
+    const [isAuth, setIsAuth] = React.useState(false)
+    const [uData, setUData] = React.useState({})
+  
+    React.useEffect(() => {
+        if (cookie.token !== undefined) {
+            setIsAuth(true)
+        }
+
+        if (isAuth) {
+            axios.post('/api/id/getProfile', {
+                token: cookie.token
+            }).then((res) => {
+                setUData(res.data)
+            })
+        }
+    })
+    
     return (
-        <Layout>
+        <Layout uData={uData} isAuth={isAuth}>
             <Content primary>
                 <div className={'grid'}>
                     <div className={'flex-grid'}>

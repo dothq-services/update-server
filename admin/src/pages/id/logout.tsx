@@ -4,22 +4,15 @@ import { Content } from '../../components/Content'
 import { useRouter } from 'next/router'
 import { useCookies } from 'react-cookie'
 
-const Callback = () => {
-    const { query } = useRouter();
+const Logout = () => {
     const router  = useRouter();
-    const [cookie, setCookie] = useCookies(["token"])
+    const [cookie, setCookie, removeCookie] = useCookies(["token"])
 
     React.useEffect(() => {
-        if (query.token) {
-            setCookie('token', query.token, {
-                path: '/',
-                expires: new Date(Date.UTC(9999, 11, 31, 23, 59, 59))
-            })
-            router.push('/')
-        } else {
-            // do something to let user know something went wrong
-        }
-    }, [query.token])
+        // idk how to logout of oauth, so let's just remove the token
+        removeCookie('token')
+        router.push('/')
+    })
 
     return (
         <Layout>
@@ -34,4 +27,4 @@ const Callback = () => {
     )
 }
 
-export default Callback;
+export default Logout;
