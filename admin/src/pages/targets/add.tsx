@@ -52,7 +52,12 @@ const AddTarget = () => {
     }
   
     React.useEffect(() => {
-        if (cookie.token !== undefined) {
+        // stupidly weird way to verify user is in dothq org
+        if (cookie.token !== undefined && axios.post('/api/id/getOrganizations', {
+            token: cookie.token  
+        }).then((res) => {
+            res.data.success === 'dothq'
+        })) {
             setIsAuth(true)
         }
 
