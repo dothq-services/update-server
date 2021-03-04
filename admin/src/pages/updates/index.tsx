@@ -4,8 +4,12 @@ import { Content } from '../../components/Content'
 import { Button } from '../../components/Button'
 import axios from 'axios'
 import { useCookies } from 'react-cookie'
+import { useRouter } from 'next/router'
+
 
 const Updates = () => {
+    const router  = useRouter();
+
     // Is user signed in?
     const [cookie, setCookie] = useCookies(["token"])
     const [isAuth, setIsAuth] = React.useState(false)
@@ -22,6 +26,10 @@ const Updates = () => {
             }).then((res) => {
                 setUData(res.data)
             })
+        }
+
+        if (cookie.token === undefined) {
+            router.push(`/noauth`)
         }
     })
     

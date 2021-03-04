@@ -7,6 +7,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         req.body.token,
         process.env.JWT_KEY
     )
+    console.log(token.token)
     axios.get('https://api.github.com/user', {
         headers: {
             'Authorization': `bearer ${token.token}`,

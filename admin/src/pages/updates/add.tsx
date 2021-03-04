@@ -5,9 +5,18 @@ import { TextField, Checkbox, InputLabel, MenuItem, FormHelperText, FormControl,
 import { FormLocaleSelector } from '../../components/Form/Locale'
 import { FormTargetSelector } from '../../components/Form/Target'
 import axios from 'axios'
-import { Console } from 'console'
+import { useCookies } from 'react-cookie'
+import { useRouter } from 'next/router'
 
 const AddUpdate = () => {
+    const router  = useRouter();
+
+    // Is user signed in?
+    const [cookie, setCookie] = useCookies(["token"])
+    const [isAuth, setIsAuth] = React.useState(false)
+    const [uData, setUData] = React.useState({})
+
+    // Form
     const [availableProducts, setAProducts] = React.useState([]);
     const [currentUploadedFile, setCurrentUploadedFile] = React.useState('')
     const [advancedMode, setAdvancedMode] = React.useState(false);
@@ -49,10 +58,26 @@ const AddUpdate = () => {
             .then(({ data }) => {
                 setAProducts(data.products);
             })
+        
+        if (cookie.token !== undefined) {
+            setIsAuth(true)
+        }
+    
+        if (isAuth) {
+            axios.post('/api/id/getProfile', {
+                token: cookie.token
+            }).then((res) => {
+                setUData(res.data)
+            })
+        }
+    
+        if (cookie.token === undefined) {
+            router.push(`/noauth`)
+        }
     }, [availableProducts])
 
     return (
-        <Layout>
+        <Layout uData={uData} isAuth={isAuth}>
             <Content primary>
                 <div className={'grid'}>
                     <div className={'flex-grid'}>

@@ -3,8 +3,17 @@ import { Layout } from '../../components/Layout'
 import { Content } from '../../components/Content'
 import { TextField, Button } from '@material-ui/core'
 import axios from 'axios'
+import { useRouter } from 'next/router'
+import { useCookies } from 'react-cookie'
 
 const AddTarget = () => {
+    const router  = useRouter();
+
+    // Is user signed in?
+    const [cookie, setCookie] = useCookies(["token"])
+    const [isAuth, setIsAuth] = React.useState(false)
+    const [uData, setUData] = React.useState({})
+
     const [tName, setTName] = React.useState('')
     const [tDisplayName, setTDisplayName] = React.useState('')
     const [showSuccessScreen, setShowSuccessScreen] = React.useState(false)
@@ -41,9 +50,27 @@ const AddTarget = () => {
             console.log(error);
           });
     }
+  
+    React.useEffect(() => {
+        if (cookie.token !== undefined) {
+            setIsAuth(true)
+        }
 
+        if (isAuth) {
+            axios.post('/api/id/getProfile', {
+                token: cookie.token
+            }).then((res) => {
+                setUData(res.data)
+            })
+        }
+
+        if (cookie.token === undefined) {
+            router.push(`/noauth`)
+        }
+    })
+    
     return (
-        <Layout>
+        <Layout uData={uData} isAuth={isAuth}>
             <Content primary>
                 <div className={'grid'}>
                     <div className={'flex-grid'}>
