@@ -33,6 +33,12 @@ yarn
 * **Admin panel** - http://localhost:9000
 * **Public API** - http://localhost:9010
 
+## Requirements
+
+* Node.js
+* Docker
+* yarn
+
 ## Author
 
 👤 **Dot HQ <contact@dothq.co>**
