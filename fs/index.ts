@@ -21,34 +21,68 @@ const storage = multer.diskStorage({
         // This is extremely important, but MAKE SURE TO SUBMIT THE FILE LOCATION BEFORE THE ACUTAL FILE
         // Like, just make sure the file order is { fileLocation, releaseFile }
         // Otherwise the location is "undefined"
-        // and it crashes the server.
-        // Will fix later
-        if (!fs.existsSync(path.join(__dirname, `./public/pub${req.body.fileLocation}`))) {
-            fs.mkdirSync(path.join(__dirname, `./public/pub${req.body.fileLocation}/`), { recursive: true })
-        } 
-        cb(null, `./public/pub/${req.body.fileLocation}`)
+        try {
+            let location = req.body.fileLocation
+            if (req.body.fileLocation) {
+                if (req.body.fileLocation.substring(0, 1) === '/') {
+                    location = req.body.fileLocation.substring(1)
+                } else {
+                    location = req.body.fileLocation
+                }
+            }
+            if (!fs.existsSync(path.join(__dirname, `./public/pub/${location}`))) {
+                fs.mkdirSync(path.join(__dirname, `./public/pub/${location}/`), { recursive: true })
+            } 
+            cb(null, `./public/pub/${req.body.fileLocation}`)
+        } catch {
+            return null;
+        }
+        
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname)
     }
 })
-const upload = multer({ storage: storage });
-app.post('/upload', upload.single('releaseFile'), (req, res, next) => {
-    const file = req.file;
-    if(req.body[0] === Object) {
-        return res.status(400).send({error: 'misorderedParams', message: 'The file location must be submitted before the file' })
-    }
-    if (!file) {
-        return res.status(400).send({ error: 'noFiles', message: 'No files were uploaded to the server'})
-    }
+const upload = multer({ storage: storage }).single('releaseFile');
+app.post('/upload', (req, res, next) => {
+    upload(req, res, (err: any) => {
+        if (err instanceof multer.MulterError) {
+            res.status(500).send({
+                error: 'serverError',
+                message: `Something went wrong on our end: ${err}`
+            })
+            return console.log(`❌ Server Error: ${err}`)
+        } else if (err) {
+            res.status(400).send({
+                error: 'clientError',
+                message: `Something went wrong on your end: ${err}. NOTE: If the error is ENOENT, try switching the order of your parameters.`
+            })
+            return console.log(`❌ Client Error: ${err}`)
+        }
 
-    res.send({ success: 'fileUploaded', message: 'File successfully uploaded', location: `/pub${req.body.fileLocation}/${req.file.originalname}`})
+        const file = req.file;
+        if (!file) {
+            return res.status(400).send({
+                error: 'noFiles',
+                message: 'No files were uploaded to the server'
+            })
+        }
+
+        res.send({
+            success: 'fileUploaded',
+            message: 'File successfully uploaded',
+            location: `/pub/${req.body.fileLocation}/${req.file.originalname}`
+        })
+        console.log(`✅ File Uploaded to /pub/${req.body.fileLocation}/${req.file.originalname}`)
+    })
+    
 })
 
 // Serve Static Files
 app.use(serveIndex('public'))
 app.use(express.static('public'))
 
+// Start Server
 app.listen(port, () => {
     console.log(`🚀 App listening at http://localhost:${port}`)
 })
