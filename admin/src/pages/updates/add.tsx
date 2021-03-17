@@ -93,6 +93,7 @@ const AddUpdate = (props) => {
     const [advancedMode, activateAdvancedMode] = React.useState(true)
     const [isUploadingFiles, setUploadingFiles] = React.useState(true)
     const [uploadedFile, setUploadedFile] = React.useState('')
+    const [isSubmitting, setIsSubmitting] = React.useState(false)
 
     const fileUploader = React.createRef<HTMLInputElement>()
 
@@ -130,18 +131,35 @@ const AddUpdate = (props) => {
             }
             return errors
         },
-        onSubmit: values => {
+        onSubmit: async values => {
             if (values.releaseFileURL === 'TEMPURLVALUESNOTFILLED') {
                 // The Release File URL was temporary, so we need to change it to the actual URL
-                values.releaseFileURL = formik.values.releaseFileURL = process.env.NEXT_PUBLIC_FILE_SERVER_URL + `/pub/${formik.values.product}/${formik.values.version}/${formik.values.target}/${getFileName(uploadedFile)}`
+                values.releaseFileURL = formik.values.releaseFileURL = process.env.NEXT_PUBLIC_FILE_SERVER_URL + `/pub/${formik.values.product}/${formik.values.version}/${formik.values.target}/${getFileName(fileUploader.current.files[0].name)}`
             }
-            alert(JSON.stringify(values, null, 2))
+
+            // Upload Release File
+            let fileUploadData = new FormData();
+            // Set file location
+            fileUploadData.append('fileLocation', `${formik.values.product}/${formik.values.version}/${formik.values.target}`)
+            // Set Auth Token
+            fileUploadData.append('token', props.cookies.token)
+            // Set File
+            fileUploadData.append('releaseFile', fileUploader.current.files[0])
+            setIsSubmitting(true)
+            // Upload File
+            await axios.post(process.env.NEXT_PUBLIC_FILE_SERVER_URL + '/upload', fileUploadData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(() => {
+                alert(JSON.stringify(values, null, 2))
+                setIsSubmitting(false)
+            })
         }
     })
     
 
     const uploadFile = (e) => {
-        // Set Uploaded File Name
         setUploadedFile(e.target.value)
         // Set Uploaded File Size
         formik.values.releaseFileSize = fileUploader.current.files[0].size;
@@ -177,7 +195,8 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.name ? formik.errors.name : `Release name for use within the Admin UI`}
                             onChange={formik.handleChange('name')}
                             value={formik.values.name} 
-                            error={formik.errors.name ? true : false}/>
+                            error={formik.errors.name ? true : false}
+                            disabled={isSubmitting} />
 
                         <MaterialSelect
                             label={"Product"} 
@@ -185,7 +204,8 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.product ? formik.errors.product : `Product to tag release under`}
                             onChange={formik.handleChange('product')}
                             value={formik.values.product} 
-                            error={formik.errors.product ? true : false}>
+                            error={formik.errors.product ? true : false}
+                            disabled={isSubmitting} >
                             <MenuItem value={'dot'}>Dot Browser</MenuItem>
                         </MaterialSelect>
                     </div>
@@ -198,7 +218,8 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.channel ? formik.errors.channel : `Release Channel`}
                             onChange={formik.handleChange('channel')}
                             value={formik.values.channel} 
-                            error={formik.errors.channel ? true : false}>
+                            error={formik.errors.channel ? true : false}
+                            disabled={isSubmitting} >
                             <MenuItem value={'release'}>Release</MenuItem>
                         </MaterialSelect>
 
@@ -208,7 +229,8 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.target ? formik.errors.target : `Build Target`}
                             onChange={formik.handleChange('target')}
                             value={formik.values.target} 
-                            error={formik.errors.target ? true : false}>
+                            error={formik.errors.target ? true : false}
+                            disabled={isSubmitting} >
                             <MenuItem value={'Linux_x86_64-gcc3'}>Linux_x86_64-gcc3</MenuItem>
                         </MaterialSelect>
                     </div>
@@ -220,7 +242,8 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.locale ? formik.errors.locale : `Locale for the release`}
                             onChange={formik.handleChange('locale')}
                             value={formik.values.locale} 
-                            error={formik.errors.locale ? true : false}>
+                            error={formik.errors.locale ? true : false}
+                            disabled={isSubmitting} >
                             <MenuItem value={'en-GB'}>en-GB</MenuItem>
                         </MaterialSelect>
 
@@ -230,7 +253,8 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.version ? formik.errors.version : `Version (Ex. 1.0)`}
                             onChange={formik.handleChange('version')}
                             value={formik.values.version} 
-                            error={formik.errors.version ? true : false}/>
+                            error={formik.errors.version ? true : false}
+                            disabled={isSubmitting} />
                     </div>
                     <div style={{ margin: 20 }} />
                     <div className={'flex-grid'}>
@@ -240,7 +264,8 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.displayVersion ? formik.errors.displayVersion : `Version (Ex. 1.0 Beta 1)`}
                             onChange={formik.handleChange('displayVersion')}
                             value={formik.values.displayVersion} 
-                            error={formik.errors.displayVersion ? true : false}/>
+                            error={formik.errors.displayVersion ? true : false}
+                            disabled={isSubmitting} />
 
                         <MaterialTextField
                             label={"Build ID"} 
@@ -248,7 +273,8 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.buildID ? formik.errors.buildID : `Build ID (Ex. 20210225185804)`}
                             onChange={formik.handleChange('buildID')}
                             value={formik.values.buildID} 
-                            error={formik.errors.buildID ? true : false}/>
+                            error={formik.errors.buildID ? true : false}
+                            disabled={isSubmitting} />
                     </div>
                     <div style={{ margin: 20 }} />
                     <div className={'flex-grid'}>
@@ -258,7 +284,8 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.whatsNewURL ? formik.errors.whatsNewURL : `URL that opens on start. Can feature %OLD_VERSION% (Ex. https://dothq.co/whatsnew/%OLD_VERSION%)`}
                             onChange={formik.handleChange('whatsNewURL')}
                             value={formik.values.whatsNewURL} 
-                            error={formik.errors.whatsNewURL ? true : false}/>
+                            error={formik.errors.whatsNewURL ? true : false}
+                            disabled={isSubmitting} />
 
                         <MaterialTextField
                             label={"Release Notes URL"} 
@@ -266,7 +293,8 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.releaseNotesURL ? formik.errors.releaseNotesURL : `Release Notes URL (Ex. https://dothq.co/release/1.0)`}
                             onChange={formik.handleChange('releaseNotesURL')}
                             value={formik.values.releaseNotesURL} 
-                            error={formik.errors.releaseNotesURL ? true : false}/>
+                            error={formik.errors.releaseNotesURL ? true : false}
+                            disabled={isSubmitting} />
                     </div>
                     <div style={{ margin: 20 }} />
                     <div className={'flex-grid'}>
@@ -275,7 +303,8 @@ const AddUpdate = (props) => {
                             formID={"fUploadCheckbox"}
                             helperText={'Upload release files, or specify a custom URL'}
                             onChange={() => setUploadingFiles(!isUploadingFiles)}
-                            checked={isUploadingFiles} />
+                            checked={isUploadingFiles} 
+                            disabled={isSubmitting} />
 
                         <div style={{ display: isUploadingFiles ? 'initial' : 'none' }}>
                             <label className={'btn btn-primary'} htmlFor={"uploadFile"} style={{ marginRight: 10 }}>Upload Release File</label>
@@ -284,7 +313,8 @@ const AddUpdate = (props) => {
                                     id={"uploadFile"} 
                                     multiple={false}
                                     onChange={e => uploadFile(e)}
-                                    ref={fileUploader} />
+                                    ref={fileUploader} 
+                                    disabled={isSubmitting} />
                                 <p>{getFileName(uploadedFile)}</p>
                         </div>
 
@@ -295,7 +325,8 @@ const AddUpdate = (props) => {
                                 helperText={formik.errors.releaseFileURL ? formik.errors.releaseFileURL : `URL for Release File (Ex. https://cdn.dothq.co/%OS%/%LANG%/release.mar)`}
                                 onChange={formik.handleChange('releaseFileURL')}
                                 value={formik.values.releaseFileURL} 
-                                error={formik.errors.releaseFileURL ? true : false}/>
+                                error={formik.errors.releaseFileURL ? true : false}
+                                disabled={isSubmitting} />
                         </div>
                     </div>
                     <div style={{ display: !isUploadingFiles ? 'initial' : 'none' }}>
@@ -307,7 +338,8 @@ const AddUpdate = (props) => {
                                 helperText={formik.errors.releaseFileSize ? formik.errors.releaseFileSize : `Size of Release File in Bytes`}
                                 onChange={formik.handleChange('releaseFileSize')}
                                 value={formik.values.releaseFileSize} 
-                                error={formik.errors.releaseFileSize ? true : false}/>
+                                error={formik.errors.releaseFileSize ? true : false}
+                                disabled={isSubmitting} />
 
                             <MaterialTextField
                                 label={"Release File SHA512 Checksum"} 
@@ -315,7 +347,8 @@ const AddUpdate = (props) => {
                                 helperText={formik.errors.releaseFileChecksum ? formik.errors.releaseFileChecksum : `SHA512 Checksum for Release File`}
                                 onChange={formik.handleChange('releaseFileChecksum')}
                                 value={formik.values.releaseFileChecksum} 
-                                error={formik.errors.releaseFileChecksum ? true : false}/>
+                                error={formik.errors.releaseFileChecksum ? true : false}
+                                disabled={isSubmitting} />
                         </div>
                     </div>
                 </Content>
@@ -334,7 +367,7 @@ const AddUpdate = (props) => {
                             {!advancedMode ? 'Simple' : 'Advanced'} Mode
                         </Button>
                         <div>
-                            <Button variant="contained" color="primary" disableElevation type={"submit"}>
+                            <Button variant="contained" color="primary" disabled={isSubmitting} disableElevation type={"submit"}>
                                 Add Release
                             </Button>
                         </div>
