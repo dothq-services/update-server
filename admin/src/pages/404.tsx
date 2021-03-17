@@ -7,7 +7,7 @@ const Index = () => {
         <Layout>
             <Content primary>
                 <div className={'grid'}>
-                    <div className={'flex-grid'}>
+                    <div>
                         <h1>Page Not Found</h1>
                     </div>
                 </div>

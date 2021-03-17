@@ -7,6 +7,7 @@ import * as cookie from 'cookie'
 import { useRouter } from 'next/router'
 import { GetServerSideProps } from 'next'
 import { useFormik } from 'formik'
+import { calculateFileChecksum } from '../../lib/hash'
 
 /**
  * A Formik wrapper for the Material Design Text Field
@@ -93,6 +94,8 @@ const AddUpdate = (props) => {
     const [isUploadingFiles, setUploadingFiles] = React.useState(true)
     const [uploadedFile, setUploadedFile] = React.useState('')
 
+    const fileUploader = React.createRef<HTMLInputElement>()
+
     const getFileName = (path) => {
         if (path.substr(0, 12) == "C:\\fakepath\\")
         return path.substr(12);
@@ -115,7 +118,7 @@ const AddUpdate = (props) => {
             whatsNewURL: '',
             releaseNotesURL: '',
             releaseFileURL: '',
-            releaseFileSize: '',
+            releaseFileSize: 0,
             releaseFileChecksum: ''
         },
         validate: values => {
@@ -128,9 +131,34 @@ const AddUpdate = (props) => {
             return errors
         },
         onSubmit: values => {
+            if (values.releaseFileURL === 'TEMPURLVALUESNOTFILLED') {
+                // The Release File URL was temporary, so we need to change it to the actual URL
+                values.releaseFileURL = formik.values.releaseFileURL = process.env.NEXT_PUBLIC_FILE_SERVER_URL + `/pub/${formik.values.product}/${formik.values.version}/${formik.values.target}/${getFileName(uploadedFile)}`
+            }
             alert(JSON.stringify(values, null, 2))
         }
     })
+    
+
+    const uploadFile = (e) => {
+        // Set Uploaded File Name
+        setUploadedFile(e.target.value)
+        // Set Uploaded File Size
+        formik.values.releaseFileSize = fileUploader.current.files[0].size;
+        formik.handleChange('releaseFileSize')
+        // Set Uploaded File Hash
+        calculateFileChecksum(fileUploader.current.files[0], (hash) => formik.values.releaseFileChecksum = hash)
+        formik.handleChange('releaseFileChecksum')
+        // Set Uploaded File URL
+        // First, make sure the values exist (if not, set the URL to a temporary URL and fix it on submit)
+        if (formik.values.product === '' || formik.values.version === '' || formik.values.target === '') {
+            formik.values.releaseFileURL = 'TEMPURLVALUESNOTFILLED'
+        } else {
+            // All values submitted, we can set the URL properly
+            formik.values.releaseFileURL = process.env.NEXT_PUBLIC_FILE_SERVER_URL + `/pub/${formik.values.product}/${formik.values.version}/${formik.values.target}/${getFileName(e.target.value)}`
+        }
+        formik.handleChange('releaseFileURL')
+    }
     return (
         <Layout uData={props.userData} isAuth={props.isAuth}>
             <Content primary>
@@ -149,7 +177,7 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.name ? formik.errors.name : `Release name for use within the Admin UI`}
                             onChange={formik.handleChange('name')}
                             value={formik.values.name} 
-                            error={formik.errors.name ? true : ''}/>
+                            error={formik.errors.name ? true : false}/>
 
                         <MaterialSelect
                             label={"Product"} 
@@ -157,8 +185,8 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.product ? formik.errors.product : `Product to tag release under`}
                             onChange={formik.handleChange('product')}
                             value={formik.values.product} 
-                            error={formik.errors.product ? true : ''}>
-                            <MenuItem value={'Dot Browser'}>Dot Browser</MenuItem>
+                            error={formik.errors.product ? true : false}>
+                            <MenuItem value={'dot'}>Dot Browser</MenuItem>
                         </MaterialSelect>
                     </div>
                 </Content>
@@ -170,7 +198,7 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.channel ? formik.errors.channel : `Release Channel`}
                             onChange={formik.handleChange('channel')}
                             value={formik.values.channel} 
-                            error={formik.errors.channel ? true : ''}>
+                            error={formik.errors.channel ? true : false}>
                             <MenuItem value={'release'}>Release</MenuItem>
                         </MaterialSelect>
 
@@ -180,7 +208,7 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.target ? formik.errors.target : `Build Target`}
                             onChange={formik.handleChange('target')}
                             value={formik.values.target} 
-                            error={formik.errors.target ? true : ''}>
+                            error={formik.errors.target ? true : false}>
                             <MenuItem value={'Linux_x86_64-gcc3'}>Linux_x86_64-gcc3</MenuItem>
                         </MaterialSelect>
                     </div>
@@ -192,7 +220,7 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.locale ? formik.errors.locale : `Locale for the release`}
                             onChange={formik.handleChange('locale')}
                             value={formik.values.locale} 
-                            error={formik.errors.locale ? true : ''}>
+                            error={formik.errors.locale ? true : false}>
                             <MenuItem value={'en-GB'}>en-GB</MenuItem>
                         </MaterialSelect>
 
@@ -202,7 +230,7 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.version ? formik.errors.version : `Version (Ex. 1.0)`}
                             onChange={formik.handleChange('version')}
                             value={formik.values.version} 
-                            error={formik.errors.version ? true : ''}/>
+                            error={formik.errors.version ? true : false}/>
                     </div>
                     <div style={{ margin: 20 }} />
                     <div className={'flex-grid'}>
@@ -212,7 +240,7 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.displayVersion ? formik.errors.displayVersion : `Version (Ex. 1.0 Beta 1)`}
                             onChange={formik.handleChange('displayVersion')}
                             value={formik.values.displayVersion} 
-                            error={formik.errors.displayVersion ? true : ''}/>
+                            error={formik.errors.displayVersion ? true : false}/>
 
                         <MaterialTextField
                             label={"Build ID"} 
@@ -220,7 +248,7 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.buildID ? formik.errors.buildID : `Build ID (Ex. 20210225185804)`}
                             onChange={formik.handleChange('buildID')}
                             value={formik.values.buildID} 
-                            error={formik.errors.buildID ? true : ''}/>
+                            error={formik.errors.buildID ? true : false}/>
                     </div>
                     <div style={{ margin: 20 }} />
                     <div className={'flex-grid'}>
@@ -230,7 +258,7 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.whatsNewURL ? formik.errors.whatsNewURL : `URL that opens on start. Can feature %OLD_VERSION% (Ex. https://dothq.co/whatsnew/%OLD_VERSION%)`}
                             onChange={formik.handleChange('whatsNewURL')}
                             value={formik.values.whatsNewURL} 
-                            error={formik.errors.whatsNewURL ? true : ''}/>
+                            error={formik.errors.whatsNewURL ? true : false}/>
 
                         <MaterialTextField
                             label={"Release Notes URL"} 
@@ -238,7 +266,7 @@ const AddUpdate = (props) => {
                             helperText={formik.errors.releaseNotesURL ? formik.errors.releaseNotesURL : `Release Notes URL (Ex. https://dothq.co/release/1.0)`}
                             onChange={formik.handleChange('releaseNotesURL')}
                             value={formik.values.releaseNotesURL} 
-                            error={formik.errors.releaseNotesURL ? true : ''}/>
+                            error={formik.errors.releaseNotesURL ? true : false}/>
                     </div>
                     <div style={{ margin: 20 }} />
                     <div className={'flex-grid'}>
@@ -255,7 +283,8 @@ const AddUpdate = (props) => {
                                     type={'file'} 
                                     id={"uploadFile"} 
                                     multiple={false}
-                                    onChange={e => setUploadedFile(e.target.value)}/>
+                                    onChange={e => uploadFile(e)}
+                                    ref={fileUploader} />
                                 <p>{getFileName(uploadedFile)}</p>
                         </div>
 
@@ -266,7 +295,7 @@ const AddUpdate = (props) => {
                                 helperText={formik.errors.releaseFileURL ? formik.errors.releaseFileURL : `URL for Release File (Ex. https://cdn.dothq.co/%OS%/%LANG%/release.mar)`}
                                 onChange={formik.handleChange('releaseFileURL')}
                                 value={formik.values.releaseFileURL} 
-                                error={formik.errors.releaseFileURL ? true : ''}/>
+                                error={formik.errors.releaseFileURL ? true : false}/>
                         </div>
                     </div>
                     <div style={{ display: !isUploadingFiles ? 'initial' : 'none' }}>
@@ -278,7 +307,7 @@ const AddUpdate = (props) => {
                                 helperText={formik.errors.releaseFileSize ? formik.errors.releaseFileSize : `Size of Release File in Bytes`}
                                 onChange={formik.handleChange('releaseFileSize')}
                                 value={formik.values.releaseFileSize} 
-                                error={formik.errors.releaseFileSize ? true : ''}/>
+                                error={formik.errors.releaseFileSize ? true : false}/>
 
                             <MaterialTextField
                                 label={"Release File SHA512 Checksum"} 
@@ -286,7 +315,7 @@ const AddUpdate = (props) => {
                                 helperText={formik.errors.releaseFileChecksum ? formik.errors.releaseFileChecksum : `SHA512 Checksum for Release File`}
                                 onChange={formik.handleChange('releaseFileChecksum')}
                                 value={formik.values.releaseFileChecksum} 
-                                error={formik.errors.releaseFileChecksum ? true : ''}/>
+                                error={formik.errors.releaseFileChecksum ? true : false}/>
                         </div>
                     </div>
                 </Content>
@@ -305,7 +334,7 @@ const AddUpdate = (props) => {
                             {!advancedMode ? 'Simple' : 'Advanced'} Mode
                         </Button>
                         <div>
-                            <Button variant="contained" color="primary" disableElevation>
+                            <Button variant="contained" color="primary" disableElevation type={"submit"}>
                                 Add Release
                             </Button>
                         </div>
