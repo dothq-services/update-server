@@ -2,7 +2,7 @@ import multer from 'multer'
 import upload from './multer'
 import authenticate from './auth'
 
-export const uploadMiddleware = (res: any, req: any) => {
+export async function uploadMiddleware(res: any, req: any) {
     upload(req, res, (err: any) => {
         // Make sure no client/server errors happen before the actual work starts
         if (err instanceof multer.MulterError) {
@@ -28,6 +28,8 @@ export const uploadMiddleware = (res: any, req: any) => {
                         message: 'No files were uploaded to the server'
                     })
                 }
+
+                res.header('Access-Control-Allow-Origin', '*')
 
                 res.send({
                     success: 'fileUploaded',

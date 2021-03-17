@@ -6,7 +6,7 @@ module.exports = {
     entry: './src/index.ts',
     devtool: 'inline-source-map',
     target: 'node',
-    mode: 'production',
+    mode: 'development',
     module: {
         rules: [{
             test: /\.tsx?$/,

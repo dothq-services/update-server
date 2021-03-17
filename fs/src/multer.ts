@@ -1,10 +1,11 @@
 import multer from 'multer'
 import path from 'path'
-import fs from 'fs'
+import fs from 'fs-extra'
+
 
 // Upload File
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: async function (req, file, cb) {
         // This is extremely important, but MAKE SURE TO SUBMIT THE FILE LOCATION BEFORE THE ACUTAL FILE
         // Like, just make sure the file order is { fileLocation, releaseFile }
         // Otherwise the location is "undefined"
@@ -18,13 +19,15 @@ const storage = multer.diskStorage({
                 } else {
                     location = req.body.fileLocation
                 }
+            } else {
+                location = ''
             }
             // Verify that the folder exists, and if not, create it
-            if (!fs.existsSync(path.join(__dirname, `./public/pub/${location}`))) {
-                fs.mkdirSync(path.join(__dirname, `./public/pub/${location}/`), { recursive: true })
-            }
+            await fs.ensureDir(path.join(__dirname, 'public', 'pub', location), err => {
+                if (err) console.log(err)
+            })
             // Return the file location
-            cb(null, `./public/pub/${req.body.fileLocation}`)
+            cb(null, path.join(__dirname, 'public', 'pub', location))
         } catch {
             return null;
         }
