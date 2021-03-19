@@ -35,6 +35,19 @@ services:
     volumes:
       - ./public:/app
 
+  dotupdate-fileserver:
+    build:
+      context: ./fs/.
+      dockerfile: Dockerfile
+    expose:
+      - "9050"
+    ports:
+      - "9050:9050"
+    volumes:
+      - ./fs:/app
+    env_file:
+      - .env
+
   dotupdate-admin:
     build:
       context: ./admin/.

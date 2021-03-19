@@ -8,6 +8,4 @@ RUN npm install --production --silent && mv node_modules ../
 
 COPY . .
 
-EXPOSE 9010
-
 CMD npm start

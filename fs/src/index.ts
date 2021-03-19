@@ -4,11 +4,16 @@ import fs from 'fs'
 import bodyParser from 'body-parser'
 import serveIndex from 'serve-index'
 import dotenv from 'dotenv'
+import cors from 'cors'
 import { uploadMiddleware } from './upload'
 dotenv.config()
 
 const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(cors({
+    origin: '*'
+}))
+
 const port = process.env.PORT || 9050
 
 // Send index page

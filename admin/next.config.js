@@ -5,10 +5,13 @@ module.exports = {
           source: '/:path*',
           headers: [
             {
-              key: 'X-Powered-By',
-              value: 'DotHQ Magic',
+                key: 'X-Powered-By',
+                value: 'DotHQ Magic',
             },
-            
+            {
+                key: 'Access-Control-Allow-Origin',
+                value: '*'
+            }
           ],
         },
       ]
