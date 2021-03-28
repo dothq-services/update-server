@@ -43,7 +43,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         await axios.post(`http://${context.req.headers.host}/api/id/getOrganizations`, {
             token: cookies.token
         }).then((res) => { 
-            if (res.data.success === 'dothq') {
+            if (res.data.success === 'userValid') {
                 isAuth = true
             }
         })

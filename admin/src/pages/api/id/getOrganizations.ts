@@ -16,7 +16,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         var i
         for (i=0; i < (ghreq as any).data.length; ++i) { 
             if (ghreq.data[i].login === 'dothq') { 
-                res.json({ success: 'dothq' })
+                res.json({ success: 'userValid' })
             } 
         }
 

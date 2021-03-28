@@ -132,29 +132,36 @@ const AddUpdate = (props) => {
             return errors
         },
         onSubmit: async values => {
-            if (values.releaseFileURL === 'TEMPURLVALUESNOTFILLED') {
-                // The Release File URL was temporary, so we need to change it to the actual URL
-                values.releaseFileURL = formik.values.releaseFileURL = process.env.NEXT_PUBLIC_FILE_SERVER_URL + `/pub/${formik.values.product}/${formik.values.version}/${formik.values.target}/${getFileName(fileUploader.current.files[0].name)}`
-            }
-
-            // Upload Release File
-            let fileUploadData = new FormData();
-            // Set file location
-            fileUploadData.append('fileLocation', `${formik.values.product}/${formik.values.version}/${formik.values.target}`)
-            // Set Auth Token
-            fileUploadData.append('token', props.cookies.token)
-            // Set File
-            fileUploadData.append('releaseFile', fileUploader.current.files[0])
-            setIsSubmitting(true)
-            // Upload File
-            await axios.post(process.env.NEXT_PUBLIC_FILE_SERVER_URL + '/upload', fileUploadData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
+            if (isUploadingFiles) {
+                if (values.releaseFileURL === 'TEMPURLVALUESNOTFILLED') {
+                    // The Release File URL was temporary, so we need to change it to the actual URL
+                    values.releaseFileURL = formik.values.releaseFileURL = process.env.NEXT_PUBLIC_FILE_SERVER_URL + `/pub/${formik.values.product}/${formik.values.version}/${formik.values.target}/${getFileName(fileUploader.current.files[0].name)}`
                 }
-            }).then(() => {
+    
+                // Upload Release File
+                let fileUploadData = new FormData();
+                // Set file location
+                fileUploadData.append('fileLocation', `${formik.values.product}/${formik.values.version}/${formik.values.target}`)
+                // Set Auth Token
+                fileUploadData.append('token', props.cookies.token)
+                // Set File
+                fileUploadData.append('releaseFile', fileUploader.current.files[0])
+                setIsSubmitting(true)
+                // Upload File
+                await axios.post(process.env.NEXT_PUBLIC_FILE_SERVER_URL + '/upload', fileUploadData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }).then(() => {
+                    alert(JSON.stringify(values, null, 2))
+                    setIsSubmitting(false)
+                })
+            } else {
+                // The file is not being uploaded, so just submit the form
                 alert(JSON.stringify(values, null, 2))
                 setIsSubmitting(false)
-            })
+            }
+            
         }
     })
     
@@ -390,7 +397,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         await axios.post(`http://${context.req.headers.host}/api/id/getOrganizations`, {
             token: cookies.token
         }).then((res) => { 
-            if (res.data.success === 'dothq') {
+            if (res.data.success === 'userValid') {
                 isAuth = true
             }
         })
