@@ -30,8 +30,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             // Get all the elements in the Releases table, with the highest ID at the top
             order: Sequelize.literal('id DESC'),
         })
-        id = +rel[0].dataValues.id + 1; // generate an ID that is one higher than the previous one
+        id = +rel[0].getDataValue('id') + 1; // generate an ID that is one higher than the previous one
         // Let's verify the Token again
+        if (param.token === undefined) {
+            return res.status(400).json({ error: 'authError', message: 'The auth token is missing'})
+        }
         await axios.post(`http://${req.headers.host}/api/id/getOrganizations`, {
             token: param.token
         }).then((values) => { 
