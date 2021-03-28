@@ -1,7 +1,7 @@
 import React from 'react'
 import { Layout } from '../../components/Layout'
 import { Content } from '../../components/Content'
-import { TextField, Checkbox, InputLabel, MenuItem, FormHelperText, FormControl, FormControlLabel, Select, Button, Input } from '@material-ui/core'
+import { TextField, Checkbox, InputLabel, MenuItem, FormHelperText, FormControl, FormControlLabel, Select, Button, Input, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core'
 import axios from 'axios'
 import * as cookie from 'cookie'
 import { useRouter } from 'next/router'
@@ -94,6 +94,14 @@ const AddUpdate = (props) => {
     const [isUploadingFiles, setUploadingFiles] = React.useState(true)
     const [uploadedFile, setUploadedFile] = React.useState('')
     const [isSubmitting, setIsSubmitting] = React.useState(false)
+    const [releaseSuccess, setReleaseSuccess] = React.useState(false)
+
+    // dialog
+    const [open, setOpen] = React.useState(false);
+
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     const fileUploader = React.createRef<HTMLInputElement>()
 
@@ -152,14 +160,54 @@ const AddUpdate = (props) => {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
-                }).then(() => {
-                    alert(JSON.stringify(values, null, 2))
+                }).then(async () => {
+                    await axios.post(`http://${props.host}/api/add/release`, {
+                        name: values.name,
+                        product: values.product,
+                        channel: values.channel,
+                        target: values.target,
+                        locale: values.locale,
+                        version: values.version,
+                        displayVersion: values.displayVersion,
+                        buildID: values.buildID,
+                        whatsNewURL: values.whatsNewURL,
+                        releaseNotesURL: values.releaseNotesURL,
+                        releaseFileURL: values.releaseFileURL,
+                        releaseFileSize: values.releaseFileSize,
+                        releaseFileChecksum: values.releaseFileChecksum,
+                        token: props.cookies.token
+                    }).then(() => { 
+                        setReleaseSuccess(true)
+                        setIsSubmitting(false)
+                    }).catch(() => {
+                        setOpen(true)
+                    })
                     setIsSubmitting(false)
                 })
             } else {
                 // The file is not being uploaded, so just submit the form
-                alert(JSON.stringify(values, null, 2))
-                setIsSubmitting(false)
+                    await axios.post(`http://${props.host}/api/add/release`, {
+                        name: values.name,
+                        product: values.product,
+                        channel: values.channel,
+                        target: values.target,
+                        locale: values.locale,
+                        version: values.version,
+                        displayVersion: values.displayVersion,
+                        buildID: values.buildID,
+                        whatsNewURL: values.whatsNewURL,
+                        releaseNotesURL: values.releaseNotesURL,
+                        releaseFileURL: values.releaseFileURL,
+                        releaseFileSize: values.releaseFileSize,
+                        releaseFileChecksum: values.releaseFileChecksum,
+                        token: props.cookies.token
+                    }).then(() => {
+                        setReleaseSuccess(true)
+                        setIsSubmitting(false)
+                    }).catch(() => {
+                        setOpen(true)
+                    })
+                    setIsSubmitting(false)
             }
             
         }
@@ -374,6 +422,9 @@ const AddUpdate = (props) => {
                             {!advancedMode ? 'Simple' : 'Advanced'} Mode
                         </Button>
                         <div>
+                            {releaseSuccess && (
+                                <p>Release Successfully Added!</p>
+                            )}
                             <Button variant="contained" color="primary" disabled={isSubmitting} disableElevation type={"submit"}>
                                 Add Release
                             </Button>
@@ -382,6 +433,23 @@ const AddUpdate = (props) => {
                 </div>
                 </Content>
             </form>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">{"Release Failed"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Adding your release failed. Please make sure all values are filled, then try again
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary" autoFocus>
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Layout>
     )
 }
@@ -415,12 +483,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         noAuth = true;
     }
 
+    const host = context.req.headers.host
+
     return {
         props: {
             cookies,
             isAuth,
             userData,
-            noAuth
+            noAuth,
+            host
         }
     }
 }
