@@ -7,7 +7,7 @@ const app = express();
 const port = 9010;
 
 app.get("/", (req, res) => {
-    res.send('The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.');
+    res.end('The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.');
 });
 
 app.get('/update/:randomNumberThing/:product/:version/:buildID/:buildTarget/:locale/:channel/:systemInformation/:moreSystemInformation/:default/:default2/update.xml', async (req, res) => {  
