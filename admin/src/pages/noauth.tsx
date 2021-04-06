@@ -9,12 +9,13 @@ import { useRouter } from 'next/router'
 const Index = (props) => {
     const router = useRouter();
 
-    if (props.noAuth) {
-        if(typeof window !== 'undefined') {
-            if(router.route !== "/noauth") router.push('/noauth')
-        } 
-    }
-
+    React.useEffect(() => {
+        if (props.noAuth) {
+            if(typeof window !== 'undefined') {
+                if(router.route !== "/noauth") router.push('/noauth')
+            } 
+        }
+    })
     return (
         <Layout uData={props.userData} isAuth={props.isAuth}>
             <Content primary>

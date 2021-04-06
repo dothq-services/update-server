@@ -7,12 +7,6 @@ import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 
 const Index = (props) => {
-    const router = useRouter();
-
-    if (props.noAuth) {
-        typeof window !== 'undefined' && router.push('/noauth')
-    }
-
     return (
         <Layout uData={props.userData} isAuth={props.isAuth}>
             <Content primary>

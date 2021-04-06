@@ -87,8 +87,6 @@ const MaterialSelect = ({ label, formID, helperText, error, ...props }) => {
 }
 
 const AddUpdate = (props) => {
-    const router  = useRouter();
-
     const [advancedMode, activateAdvancedMode] = React.useState(true)
     const [isSubmitting, setIsSubmitting] = React.useState(false)
     const [releaseSuccess, setReleaseSuccess] = React.useState(false)
@@ -99,10 +97,14 @@ const AddUpdate = (props) => {
     const handleClose = () => {
         setOpen(false);
     };
-
-    if (props.noAuth) {
-        typeof window !== 'undefined' && router.push('/noauth')
-    }
+    
+    const router = useRouter();
+    
+    React.useEffect(() => {
+        if (props.noAuth) {
+            typeof window !== 'undefined' && router.push('/noauth')
+        }
+    })
 
     const formik = useFormik({
         initialValues: {

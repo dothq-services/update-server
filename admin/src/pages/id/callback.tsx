@@ -6,15 +6,15 @@ import * as cookie from 'cookie'
 import { GetServerSideProps } from 'next'
 
 const Callback = (props) => {
-    if (props.isSuccess === true) {
-        const router  = useRouter();
-        React.useEffect(() => {
-            typeof window !== 'undefined' && router.push('/')
-        })
-    } else {
-        // Something went wrong yay
-    }
+    const router  = useRouter();
 
+    React.useEffect(() => {
+        if (props.isSuccess === true) {
+            typeof window !== 'undefined' && router.push('/')
+        } else {
+            // Something went wrong yay
+        }
+    })
     return (
         <Layout>
             <Content primary>
@@ -36,11 +36,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (token) {
         context.res.setHeader('Set-Cookie', cookie.serialize('token', String(token), {
             path: '/',
-            expires: new Date(Date.UTC(9999, 11, 31, 23, 59, 59))
+            expires: new Date(Date.UTC(9999, 11, 31, 23, 59, 59)),
+            sameSite: 'none',
+            secure: true
         }));
 
         isSuccess = true
-        console.log(isSuccess)
     }
 
     return {
