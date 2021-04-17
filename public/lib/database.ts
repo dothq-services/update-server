@@ -70,6 +70,10 @@ export const Releases = db.define('releases', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    releaseFileSize: {
+        type: DataTypes.INTEGER,
+        allowNull:false
+    },
     releaseType: {
         type: DataTypes.STRING,
         allowNull: false

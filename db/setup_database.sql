@@ -23,16 +23,16 @@ CREATE TABLE `releases` (
   `channel` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
   `locale` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
   `target` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `version` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `version` int(11) COLLATE utf8_bin NOT NULL DEFAULT '',
   `displayVersion` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `buildID` int(11) NOT NULL DEFAULT '0',
-  `whatsnewurl` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `releasenotesurl` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `releaseurl` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `releasesha512` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `releasesize` int(11) NOT NULL DEFAULT '0',
-  `releasetype` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  PRIMARY KEY (`name`)
+  `buildID` varchar(255) NOT NULL DEFAULT '0',
+  `whatsNewURL` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `releaseNotesURL` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `releaseFileURL` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `releaseFileChecksum` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `releaseFileSize` int(11) NOT NULL DEFAULT '0',
+  `releaseType` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='DotUpdate Releases';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
