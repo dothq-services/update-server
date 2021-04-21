@@ -23,7 +23,7 @@ CREATE TABLE `releases` (
   `channel` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
   `locale` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
   `target` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `version` int(11) NOT NULL DEFAULT '',
+  `version` int(11) NOT NULL DEFAULT '0',
   `displayVersion` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
   `buildID` varchar(255) NOT NULL DEFAULT '0',
   `whatsNewURL` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
